@@ -21,18 +21,26 @@ function UserDashboard() {
   };
 
   return (
-    <div>
-      <h2>All Stores</h2>
+    <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+      <h2>Browse Stores</h2>
+      
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          placeholder="Search by name or address"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ padding: "8px", width: "300px", marginRight: "10px" }}
+        />
+        <button onClick={fetchStores}>Search</button>
+      </div>
 
-      <input
-        placeholder="Search by name or address"
-        onChange={(e) => setSearch(e.target.value)}
-      />
-      <button onClick={fetchStores}>Search</button>
-
-      {stores.map((store) => (
-        <StoreCard key={store.id} store={store} onRate={rateStore} />
-      ))}
+      {stores.length === 0 ? (
+        <p>No stores found</p>
+      ) : (
+        stores.map(store => (
+          <StoreCard key={store.id} store={store} onRate={rateStore} />
+        ))
+      )}
     </div>
   );
 }

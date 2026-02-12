@@ -5,37 +5,53 @@ import { AuthContext } from "../context/AuthContext";
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { data } = await API.post("/auth/login", form);
-
-    login(data);
-
-    if (data.user.role === "ADMIN") navigate("/admin");
-    if (data.user.role === "USER") navigate("/user");
-    if (data.user.role === "STORE_OWNER") navigate("/owner");
+    try {
+      const { data } = await API.post("/auth/login", form);
+      login(data);
+      
+      if (data.user.role === "ADMIN") navigate("/admin");
+      else if (data.user.role === "USER") navigate("/user");
+      else navigate("/owner");
+    } catch (err) {
+      setError(err.response?.data?.message || "Login failed");
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div style={{ maxWidth: "400px", margin: "0 auto" }}>
       <h2>Login</h2>
-      <input
-        placeholder="Email"
-        onChange={(e) => setForm({ ...form, email: e.target.value })}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setForm({ ...form, password: e.target.value })}
-      />
-      <button>Login</button>
-      <p>
-        No account? <Link to="/signup">Signup</Link>
-      </p>
-    </form>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: "10px" }}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={(e) => setForm({...form, email: e.target.value})}
+            style={{ width: "100%", padding: "8px" }}
+            required
+          />
+        </div>
+        <div style={{ marginBottom: "10px" }}>
+          <input
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={(e) => setForm({...form, password: e.target.value})}
+            style={{ width: "100%", padding: "8px" }}
+            required
+          />
+        </div>
+        <button type="submit" style={{ padding: "10px 20px" }}>Login</button>
+        <p><Link to="/signup">Create an account</Link></p>
+      </form>
+    </div>
   );
 }
 
